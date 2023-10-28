@@ -1,0 +1,48 @@
+version: '3.1'
+
+services:
+    postgres:
+        image: postgres
+        container_name: 'postgres'
+        restart: always
+        environment:
+            - POSTGRES_USER = postgres
+            - POSTGRES_PASSWORD = example
+        ports:
+            - '5432:5432'
+        networks:
+            my-network:
+                ipv4_address: 192.168.3.4
+    firebird:
+        image: jacobalberty/firebird:v3.0.6
+        container_name: 'firebird'
+        environment:
+            - ISC_PASSWORD = masterkey
+            - EnableLegacyClientAuth = true
+        ports:
+            - '3050:3050'
+        networks:
+            my-network:
+                ipv4_address: 192.168.3.3
+    switch-server:
+        image: mgimenezdev/switch-server
+        container_name: 'switch-server'
+        ports:
+            - '5000:5000'
+        networks:
+            my-network:
+                ipv4_address: 192.168.3.2
+    switch-client:
+        container_name: 'client'
+        image: mgimenezdev/switch-client
+        ports:
+            - '8080:8080'
+        networks:
+            my-network:
+                ipv4_address: 192.168.3.1
+networks:
+    my-network:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: 192.168.3.0/24
