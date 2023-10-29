@@ -7,6 +7,10 @@ services:
         environment:
             - POSTGRES_USER=admin
             - POSTGRES_PASSWORD=masterkey
+            - POSTGRES_INIT_SCRIPT=/entrypoint/init.sh
+            - POSTGRES_DB=personal
+        volumes:
+            - ./database/postgres:/docker-entrypoint-initdb.d
         ports:
             - '5432:5432'
 
@@ -18,9 +22,13 @@ services:
         container_name: 'firebird'
         environment:
             - ISC_PASSWORD=masterkey
+            - FIREBIRD_DATABASE=facturacion.fdb
             - EnableLegacyClientAuth=true
+            - FIREBIRD_INIT_SCRIPT=/entrypoint/init.sh
         ports:
             - '3062:3050'
+        volumes:
+            - ./database/firebird:/entrypoint
         networks:
             my-network:
                 ipv4_address: 192.168.3.3
