@@ -18,9 +18,7 @@ class RequestHandler implements Runnable {
 
   public void run() {
     StringBuilder stringBuilder;
-    System.out.println("Servidor switch iniciado en el puerto 5000.");
 
-    // Realiza operaciones en la base de datos aquí
     // Parámetros de conexión postgres
     String postgresIp = "192.168.3.4";
     String postgresPort = "5432";
@@ -47,8 +45,8 @@ class RequestHandler implements Runnable {
         .append(":/firebird/data/facturacion.fdb");
     String firebirdUrl = stringBuilder.toString();
 
-    Connection connection;
-    Statement statement;
+    Connection connection = null;
+    Statement statement = null;
 
     try {
       // Leo la peticion desde el socket del cliente
@@ -63,33 +61,38 @@ class RequestHandler implements Runnable {
       Gson gson = new Gson();
       Query query = gson.fromJson(json, Query.class);
 
-      connection =
-        DriverManager.getConnection(
-          firebirdUrl,
-          firebirdUsername,
-          firebirdPassword
-        );
-      statement = connection.createStatement();
-      System.out.println("Conexión exitosa a la base de datos FIREBIRD.");
+      if (query.getDatabase().equals("FACTURACION")) {
+        connection =
+          DriverManager.getConnection(
+            firebirdUrl,
+            firebirdUsername,
+            firebirdPassword
+          );
+        statement = connection.createStatement();
+        System.out.println("Conexión exitosa a la base de datos FACTURACION.");
+      }
 
-      connection =
-        DriverManager.getConnection(
-          postgresUrl,
-          postgresUsername,
-          postgresPassword
-        );
+      if (query.getDatabase().equals("PERSONAL")) {
+        connection =
+          DriverManager.getConnection(
+            postgresUrl,
+            postgresUsername,
+            postgresPassword
+          );
 
-      System.out.println("Conexión exitosa a la base de datos PostgreSQL.");
+        System.out.println("Conexión exitosa a la base de datos PERSONAL.");
+      }
 
       // Devuelvo resultado del query
       PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
       out.println("Resultado del query: " + query.getQuery());
 
-      // Cierro streams y socket
+      if (connection != null) {
+        connection.close();
+        statement.close();
+      }
       in.close();
       out.close();
-      connection.close();
-      statement.close();
       clientSocket.close();
     } catch (IOException e) {
       System.out.println(

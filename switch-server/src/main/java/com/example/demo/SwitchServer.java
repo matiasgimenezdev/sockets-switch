@@ -17,7 +17,6 @@ public class SwitchServer {
       socket = new ServerSocket(5000);
       System.out.println("Servidor switch iniciado en el puerto 5000.");
 
-      // Realiza operaciones en la base de datos aquí
       // Parámetros de conexión postgres
       String postgresIp = "192.168.3.4";
       String postgresPort = "5432";
@@ -63,7 +62,6 @@ public class SwitchServer {
           );
 
         statement = connection.createStatement();
-        System.out.println("Conexión exitosa a la base de datos FIREBIRD.");
         query =
           """
           CREATE TABLE FACTURA
@@ -104,8 +102,6 @@ public class SwitchServer {
           """;
         statement.execute(query);
 
-        System.out.println("Tablas en FACTURACION creadas con éxito.");
-
         statement.close();
         connection.close();
       } catch (SQLException e) {
@@ -122,8 +118,6 @@ public class SwitchServer {
             postgresPassword
           );
 
-        System.out.println("Conexión exitosa a la base de datos PostgreSQL.");
-
         query =
           """
           CREATE TABLE EMPLEADO (
@@ -138,8 +132,6 @@ public class SwitchServer {
         statement.execute(query);
         statement.close();
         connection.close();
-
-        System.out.println("Tablas en PERSONAL creadas con éxito.");
       } catch (SQLException e) {
         System.err.println(
           "Error al conectar a la base de datos POSTGRES: " + e.getMessage()
@@ -148,8 +140,6 @@ public class SwitchServer {
 
       while (true) {
         Socket clientSocket = socket.accept();
-        System.out.println("Conexión entrante aceptada.");
-
         Thread thread = new Thread(new RequestHandler(clientSocket));
         thread.start();
       }
