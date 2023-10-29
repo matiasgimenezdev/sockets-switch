@@ -10,6 +10,7 @@ public class SwitchServer {
     try {
       socket = new ServerSocket(5000);
       System.out.println("Servidor switch iniciado en el puerto 5000.");
+
       while (true) {
         Socket clientSocket = socket.accept();
         System.out.println("Conexión entrante aceptada.");

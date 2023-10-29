@@ -13,6 +13,30 @@ class RequestHandler implements Runnable {
   }
 
   public void run() {
+    // Parámetros de conexión postgres
+    String postgresIp = "192.168.3.4";
+    String postgresPort = "5432";
+    String postgresUsername = "admin";
+    String postgresPassword = "masterkey";
+    String postgresUrl =
+      "jdbc:postgresql://" +
+      postgresIp +
+      ":" +
+      postgresPort +
+      "/personal-switch";
+
+    // Parámetros de conexión firebird
+    String firebirdIp = "192.168.3.3";
+    String firebirdPort = "3050";
+    String firebirdUsername = "sysdba";
+    String firebirdPassword = "masterkey";
+    String firebirdUrl =
+      "jdbc:firebird://" +
+      firebirdIp +
+      ":" +
+      firebirdPort +
+      "/firebird/data/facturacion-switch.fdb";
+
     try {
       // Leo la peticion desde el socket del cliente
       BufferedReader in = new BufferedReader(

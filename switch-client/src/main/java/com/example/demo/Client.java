@@ -11,7 +11,7 @@ public class Client {
     Scanner sc = new Scanner(System.in);
 
     try {
-      // Socket socket = new Socket("192.168.3.2", 5000);
+      //Socket socket = new Socket("192.168.3.102", 5000);
       Socket socket = new Socket("localhost", 5000);
       String op = "-1";
       Query query = new Query();
@@ -20,7 +20,7 @@ public class Client {
 
       System.out.println("");
       System.err.println("Conexión establecida con el servidor switch");
-
+      System.out.println("");
       while (!(op.equals("0"))) {
         System.out.println("");
         System.out.println("# Bases de datos disponibles: ");
@@ -56,7 +56,9 @@ public class Client {
         socket.close();
         in.close();
         out.close();
+        System.out.println("");
         System.err.println("Conexión terminada con el servidor switch");
+        System.out.println("");
       }
     } catch (IOException e) {
       System.out.println("Error: " + e.getMessage());
