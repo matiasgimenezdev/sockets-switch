@@ -8,6 +8,7 @@ La petición de consulta no se hace directamente sobre el servidor de bases de d
 ## Tecnologias utilizadas 🛠️
 
 -   Java + Spring
+-   Maven
 -   Docker + Docker compose
 -   Firebird
 -   Postgres
