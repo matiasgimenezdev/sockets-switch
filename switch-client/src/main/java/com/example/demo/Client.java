@@ -61,16 +61,20 @@ public class Client {
             JsonObject jsonObject = jsonElement.getAsJsonObject();
             JsonArray responseArray = jsonObject.getAsJsonArray("response");
 
-            // Recorre las filas de la respuesta al query
-            for (JsonElement element : responseArray) {
-              JsonObject responseItem = element.getAsJsonObject();
-              for (java.util.Map.Entry<String, JsonElement> entry : responseItem.entrySet()) {
-                String propertyName = entry.getKey(); // Nombre de la columna
-                JsonElement propertyValue = entry.getValue(); // Valor de la columna
-                System.out.print(propertyName + ": ");
-                System.out.print(propertyValue + "; ");
+            if (responseArray.size() > 0) {
+              for (JsonElement element : responseArray) {
+                JsonObject responseItem = element.getAsJsonObject();
+                for (java.util.Map.Entry<String, JsonElement> entry : responseItem.entrySet()) {
+                  String propertyName = entry.getKey(); // Nombre de la columna
+                  JsonElement propertyValue = entry.getValue(); // Valor de la columna
+                  System.out.print(propertyName + ": ");
+                  System.out.print(propertyValue + "; ");
+                }
+                System.out.print("\n");
               }
-              System.out.print("\n");
+            } else {
+              System.out.println("No existen filas en la tabla");
+              System.out.println("");
             }
           } else {
             System.out.println(response);
