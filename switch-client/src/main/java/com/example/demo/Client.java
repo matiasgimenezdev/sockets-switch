@@ -1,6 +1,10 @@
 package com.example.demo;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
@@ -37,6 +41,7 @@ public class Client {
 
           System.out.print("Ingrese el query SQL que quiere ejecutar: ");
           String sql = sc.nextLine();
+          System.out.println("");
           query.setQuery(sql.trim());
           if (op.equals("1")) {
             query.setDatabase("facturacion");
@@ -47,11 +52,28 @@ public class Client {
           String json = gson.toJson(query);
           out = new PrintWriter(socket.getOutputStream(), true);
           out.println(json);
+
           in =
             new BufferedReader(new InputStreamReader(socket.getInputStream()));
-          System.out.println("");
-          System.out.println(in.readLine());
-          System.out.println("");
+          String response = in.readLine();
+          if (response.contains("response")) {
+            JsonElement jsonElement = JsonParser.parseString(response);
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            JsonArray responseArray = jsonObject.getAsJsonArray("response");
+
+            // Recorre las filas de la respuesta al query
+            for (JsonElement element : responseArray) {
+              JsonObject responseItem = element.getAsJsonObject();
+              for (java.util.Map.Entry<String, JsonElement> entry : responseItem.entrySet()) {
+                String propertyName = entry.getKey(); // Nombre de la columna
+                JsonElement propertyValue = entry.getValue(); // Valor de la columna
+                System.out.print(propertyName + ": ");
+                System.out.println(propertyValue + "; ");
+              }
+            }
+          } else {
+            System.out.println(response);
+          }
 
           socket.close();
           in.close();
