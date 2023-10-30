@@ -68,8 +68,9 @@ public class Client {
                 String propertyName = entry.getKey(); // Nombre de la columna
                 JsonElement propertyValue = entry.getValue(); // Valor de la columna
                 System.out.print(propertyName + ": ");
-                System.out.print(propertyValue + "; \n");
+                System.out.print(propertyValue + ";");
               }
+              System.out.println("\n");
             }
           } else {
             System.out.println(response);
