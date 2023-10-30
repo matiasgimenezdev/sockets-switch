@@ -11,16 +11,11 @@ public class Client {
     Scanner sc = new Scanner(System.in);
 
     try {
-      //Socket socket = new Socket("192.168.3.102", 5000);
-      Socket socket = new Socket("localhost", 5000);
       String op = "-1";
       Query query = new Query();
       BufferedReader in = null;
       PrintWriter out = null;
 
-      System.out.println("");
-      System.err.println("Conexión establecida con el servidor switch");
-      System.out.println("");
       while (!(op.equals("0"))) {
         System.out.println("");
         System.out.println("# Bases de datos disponibles: ");
@@ -36,6 +31,11 @@ public class Client {
         System.out.println("");
 
         if (!op.equals("0")) {
+          Socket socket = new Socket("localhost", 5000);
+          System.out.println("");
+          System.err.println("Conexión establecida con el servidor switch");
+          System.out.println("");
+
           System.out.print("Ingrese el query SQL que quiere ejecutar: ");
           String sql = sc.nextLine();
           query.setQuery(sql.trim());
@@ -50,15 +50,17 @@ public class Client {
           out.println(json);
           in =
             new BufferedReader(new InputStreamReader(socket.getInputStream()));
+          System.out.println("");
           System.out.println(in.readLine());
-        }
+          System.out.println("");
 
-        socket.close();
-        in.close();
-        out.close();
-        System.out.println("");
-        System.err.println("Conexión terminada con el servidor switch");
-        System.out.println("");
+          socket.close();
+          in.close();
+          out.close();
+          System.out.println("");
+          System.err.println("Conexión terminada con el servidor switch");
+          System.out.println("");
+        }
       }
     } catch (IOException e) {
       System.out.println("Error: " + e.getMessage());

@@ -1,10 +1,14 @@
 package com.example.demo;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import java.io.*;
 import java.net.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -47,12 +51,14 @@ class RequestHandler implements Runnable {
 
     Connection connection = null;
     Statement statement = null;
+    ResultSet queryResult = null;
 
     try {
       // Leo la peticion desde el socket del cliente
       BufferedReader in = new BufferedReader(
         new InputStreamReader(clientSocket.getInputStream())
       );
+      PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 
       String json = in.readLine();
       System.out.println("JSON recibido: " + json);
@@ -69,7 +75,9 @@ class RequestHandler implements Runnable {
             firebirdPassword
           );
         statement = connection.createStatement();
-        System.out.println("Conexión exitosa a la base de datos FACTURACION.");
+        System.out.println(
+          "Conexión exitosa a la base de datos FACTURACION en servidor Firebird."
+        );
       }
 
       if (query.getDatabase().equals("PERSONAL")) {
@@ -79,23 +87,64 @@ class RequestHandler implements Runnable {
             postgresUsername,
             postgresPassword
           );
-
-        System.out.println("Conexión exitosa a la base de datos PERSONAL.");
+        System.out.println(
+          "Conexión exitosa a la base de datos PERSONAL en servidor Postgres."
+        );
+        statement = connection.createStatement();
       }
 
-      // Devuelvo resultado del query
-      PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-      out.println("Resultado del query: " + query.getQuery());
+      try {
+        JsonObject response = new JsonObject();
+        if (query.getQuery().contains("SELECT")) {
+          queryResult = statement.executeQuery(query.getQuery());
+          ResultSetMetaData metadata = queryResult.getMetaData();
+          int columnCount = metadata.getColumnCount();
+          JsonArray jsonArray = new JsonArray();
+          while (queryResult.next()) {
+            JsonObject row = new JsonObject();
+            for (int i = 1; i <= columnCount; i++) {
+              String columnName = metadata.getColumnName(i);
+              String value = queryResult.getObject(i).toString();
+              row.addProperty(columnName, value);
+            }
+            jsonArray.add(row);
+          }
+          response.add("response", jsonArray);
+          out.println(response.toString());
+          System.out.println(response.toString());
+        } else {
+          String message = "";
+          int rowCount = statement.executeUpdate(query.getQuery());
+          if (rowCount > 0) {
+            message =
+              "Actualización exitosa sobre la base de datos " +
+              query.getDatabase() +
+              ". Se actualizaron " +
+              rowCount +
+              " filas.";
+          } else {
+            message =
+              "No se pudo actualizar la base de datos " + query.getDatabase();
+          }
+          out.println(message);
+          System.out.println(message);
+        }
+      } catch (SQLException e) {
+        out.println("ERROR al ejecutar el query: " + e.getMessage());
+        System.out.println("ERROR al ejecutar el query: " + e.getMessage());
+      } finally {
+        queryResult.close();
+      }
 
       if (connection != null) {
         connection.close();
         statement.close();
       }
-      in.close();
       out.close();
+      in.close();
       clientSocket.close();
     } catch (IOException e) {
-      System.out.println(
+      System.err.println(
         "Error al manejar la conexión del cliente: " + e.getMessage()
       );
     } catch (SQLException e) {
