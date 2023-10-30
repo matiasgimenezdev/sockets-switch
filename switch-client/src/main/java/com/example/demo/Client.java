@@ -28,7 +28,6 @@ public class Client {
         System.out.print("Seleccione con cual quiere interactuar: ");
         op = sc.next();
         sc.nextLine();
-        System.out.println("");
 
         if (!op.equals("0")) {
           Socket socket = new Socket("localhost", 5000);
